@@ -12,406 +12,159 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
-    /* --- COULEURS --- */
     :root{
-      --ink: #051e35; 
-      --cream: #fdf6f0; 
-      --card-bg: #f4e6da; 
-      --white: #ffffff; 
-      --accent: #c5a065; 
+      --ink: #051e35;
+      --cream: #fdf6f0;
+      --card-bg: #f4e6da;
+      --white: #ffffff;
+      --accent: #c5a065;
       --muted: #5d6d7a;
       --radius: 4px;
     }
-    
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
-    
-    body{
-      font-family:'Lato', sans-serif;
-      line-height:1.6;
-      background:var(--cream);
-      color:var(--ink);
-      overflow-x:hidden;
-    }
-    
-    h1,h2,h3,h4{font-family:'Playfair Display', serif; color:var(--ink); margin-bottom:0.5rem;}
+    body{font-family:'Lato',sans-serif;line-height:1.6;background:var(--cream);color:var(--ink);overflow-x:hidden;}
+    h1,h2,h3,h4{font-family:'Playfair Display',serif;color:var(--ink);margin-bottom:0.5rem;}
     h1{font-weight:700;}
-    
     img{max-width:100%;display:block;height:auto}
     a{color:inherit;text-decoration:none;transition:all .3s ease}
-    
     .container{max-width:1100px;margin:0 auto;padding:0 20px}
-    .thin-line{border-top:1px solid #e0ddd5}
 
-    /* BOUTONS */
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-      background:var(--ink); color:#fff;
-      padding:1rem 1.5rem; border-radius:var(--radius);
-      font-weight:700; letter-spacing:0.5px;
-      border:2px solid var(--ink); cursor:pointer; transition:all .3s ease;
-      font-family: 'Lato', sans-serif;
-    }
-    .btn:hover{
-      background:var(--accent); border-color:var(--accent);
-      transform:translateY(-2px); box-shadow:0 5px 15px rgba(197,160,101,0.3);
-    }
-    .btn-ghost{
-      background:transparent; color:var(--ink); border:2px solid var(--ink);
-    }
-    .btn-ghost:hover{
-      background:var(--ink); color:#fff;
-    }
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:var(--ink);color:#fff;padding:1rem 1.5rem;border-radius:var(--radius);font-weight:700;letter-spacing:0.5px;border:2px solid var(--ink);cursor:pointer;transition:all .3s ease;font-family:'Lato',sans-serif;}
+    .btn:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-2px);box-shadow:0 5px 15px rgba(197,160,101,0.3);}
+    .btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--ink);}
+    .btn-ghost:hover{background:var(--ink);color:#fff;}
 
     /* LIGHTBOX */
-    .lightbox{
-      display:none;
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:rgba(0,0,0,0.95);
-      z-index:9999;
-      align-items:center;
-      justify-content:center;
-    }
-    .lightbox.active{
-      display:flex;
-    }
-    .lightbox-content{
-      max-width:90%;
-      max-height:90%;
-      position:relative;
-    }
-    .lightbox-content img{
-      max-width:100%;
-      max-height:90vh;
-      object-fit:contain;
-    }
-    .lightbox-close{
-      position:absolute;
-      top:-40px;
-      right:0;
-      background:none;
-      border:none;
-      color:#fff;
-      font-size:40px;
-      cursor:pointer;
-      font-weight:300;
-      line-height:1;
-    }
-    .lightbox-close:hover{
-      color:var(--accent);
-    }
+    .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;}
+    .lightbox.active{display:flex;}
+    .lightbox-content{max-width:90%;max-height:90%;position:relative;}
+    .lightbox-content img{max-width:100%;max-height:90vh;object-fit:contain;}
+    .lightbox-close{position:absolute;top:-40px;right:0;background:none;border:none;color:#fff;font-size:40px;cursor:pointer;font-weight:300;line-height:1;}
+    .lightbox-close:hover{color:var(--accent);}
 
     /* HEADER */
-    header{
-      position:sticky; top:0; z-index:1000;
-      background: rgba(253, 246, 240, 0.95); 
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(5,30,53,0.05);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
-    .nav{
-      display:flex; align-items:center; justify-content:space-between; height:100px;
-    }
-    .logo-img{
-      height:105px; 
-      width:auto; display:block;
-      mix-blend-mode: multiply; 
-    }
-    .menu{display:flex; gap:30px; align-items:center;}
-    .menu a{
-      font-weight:700; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;
-      padding:10px 0; border-bottom:2px solid transparent; color:var(--ink);
-    }
-    .menu a:hover{color:var(--accent); border-bottom-color:var(--accent);}
-    .menu-toggle{display:none; cursor:pointer; flex-direction:column; gap:6px;}
-    .menu-toggle span{width:30px; height:3px; background:var(--ink); transition:0.3s;}
+    header{position:sticky;top:0;z-index:1000;background:rgba(253,246,240,0.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(5,30,53,0.05);box-shadow:0 2px 10px rgba(0,0,0,0.03);}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:100px;}
+    .logo-img{height:105px;width:auto;display:block;mix-blend-mode:multiply;}
+    .menu{display:flex;gap:30px;align-items:center;}
+    .menu a{font-weight:700;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;padding:10px 0;border-bottom:2px solid transparent;color:var(--ink);}
+    .menu a:hover{color:var(--accent);border-bottom-color:var(--accent);}
 
     /* HERO */
-    .hero{
-      padding:60px 0 80px; 
-      position:relative;
-      background: var(--cream);
-    }
-    .hero .grid{
-      display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;
-    }
-    .eyebrow{
-      color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:1rem; font-size:0.9rem;
-    }
-    .title{font-size:3.5rem; line-height:1.1; margin-bottom:1.5rem;}
-    .title-sub{
-      font-size:1.8rem; font-style:italic; font-weight:400; color:var(--muted); 
-      display:block; margin-top:15px; font-family:'Playfair Display', serif;
-    }
-    .lead{font-size:1.15rem; color:var(--muted); margin-bottom:2rem; max-width:480px;}
-    
-    .hero-img-box{
-      position:relative; border-radius:var(--radius); overflow:hidden;
-      box-shadow: 20px 20px 0px var(--ink);
-      height: 250px;
-    }
+    .hero{padding:60px 0 80px;position:relative;background:var(--cream);}
+    .hero .grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+    .eyebrow{color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:1rem;font-size:0.9rem;}
+    .title{font-size:3.5rem;line-height:1.1;margin-bottom:1.5rem;}
+    .title-sub{font-size:1.8rem;font-style:italic;font-weight:400;color:var(--muted);display:block;margin-top:15px;font-family:'Playfair Display',serif;}
+    .lead{font-size:1.15rem;color:var(--muted);margin-bottom:2rem;max-width:480px;}
+    .hero-img-box{position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:20px 20px 0px var(--ink);height:250px;}
+    .hero-img-box img{width:100%;height:100%;object-fit:contain;object-position:50% 50%;}
 
-    .hero-img-box img{ 
-      width: 100%; 
-      height: 100%; 
-      object-fit: contain;
-      object-position: 50% 50%;
-      transform: none; 
-    } 
-
-    /* QUI SUIS-JE */
-    .about{padding:80px 0; background:var(--white);}
-    .about-grid{
-      display:grid; grid-template-columns:400px 1fr; gap:60px; align-items:center;
-    }
-    .about-img{
-      border-radius:var(--radius); overflow:hidden; height: 450px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.1);
-    }
-    .about-img img { width:100%; height:100%; object-fit:cover; object-position: center top; }
-    .about-content h2{font-size:2.5rem; margin-bottom:1.5rem;}
-    .about-content p{margin-bottom:1.5rem; font-size:1.1rem; color:#444;}
+    /* ABOUT */
+    .about{padding:80px 0;background:var(--white);}
+    .about-grid{display:grid;grid-template-columns:400px 1fr;gap:60px;align-items:center;}
+    .about-img{border-radius:var(--radius);overflow:hidden;height:450px;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
+    .about-img img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+    .about-content h2{font-size:2.5rem;margin-bottom:1.5rem;}
+    .about-content p{margin-bottom:1.5rem;font-size:1.1rem;color:#444;}
 
     /* SERVICES */
-    .services{padding:80px 0; background:var(--white);}
-    .section-header{text-align:center; max-width:700px; margin:0 auto 60px;}
+    .services{padding:80px 0;background:var(--white);}
+    .section-header{text-align:center;max-width:700px;margin:0 auto 60px;}
     .section-header h2{font-size:2.8rem;}
-    .section-header p{font-size:1.2rem; color:var(--muted);}
-    
-    .services-grid{
-      display:grid; grid-template-columns:repeat(3, 1fr); gap:30px;
-    }
-    
-    .service-card{
-      background: var(--card-bg); 
-      padding:35px 25px; 
-      border-radius:var(--radius);
-      border:1px solid rgba(0,0,0,0.02);
-      transition:0.3s;
-      box-shadow:0 5px 10px rgba(0,0,0,0.02);
-      display:flex; flex-direction:column;
-    }
-    .service-card:hover{
-      transform:translateY(-5px); border-top:3px solid var(--accent);
-      box-shadow:0 15px 30px rgba(0,0,0,0.08);
-    }
-    .icon{font-size:2.2rem; margin-bottom:1rem; display:block;}
-    .service-card h3{font-size:1.3rem; color:var(--ink); margin-bottom:1rem; font-weight:700;}
-    .service-card p{font-size:0.95rem; color:#555; flex-grow:1;}
+    .section-header p{font-size:1.2rem;color:var(--muted);}
+    .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;}
+    .service-card{background:var(--card-bg);padding:35px 25px;border-radius:var(--radius);border:1px solid rgba(0,0,0,0.02);transition:0.3s;box-shadow:0 5px 10px rgba(0,0,0,0.02);display:flex;flex-direction:column;}
+    .service-card:hover{transform:translateY(-5px);border-top:3px solid var(--accent);box-shadow:0 15px 30px rgba(0,0,0,0.08);}
+    .icon{font-size:2.2rem;margin-bottom:1rem;display:block;}
+    .service-card h3{font-size:1.3rem;color:var(--ink);margin-bottom:1rem;font-weight:700;}
+    .service-card p{font-size:0.95rem;color:#555;flex-grow:1;}
 
     /* PARTENAIRES */
-    .partners{
-      padding:40px 0; background:var(--ink); color:var(--white); text-align:center;
-    }
-    .partners p{font-size:1.1rem; font-family:'Playfair Display', serif; font-style:italic; letter-spacing:0.5px; color: #ffffff;}
+    .partners{padding:40px 0;background:var(--ink);color:var(--white);text-align:center;}
+    .partners p{font-size:1.1rem;font-family:'Playfair Display',serif;font-style:italic;letter-spacing:0.5px;color:#ffffff;}
 
     /* SHOWROOM */
-    .showroom{padding:50px 0; background:var(--white);}
-    
-    .showroom-grid{
-      display:grid; 
-      grid-template-columns:1fr 1fr; 
-      gap:25px;
-      align-items:stretch;
-    }
-    
-    .info-box{
-      background:var(--ink); color:var(--white); 
-      padding:30px;
-      border-radius:var(--radius);
-      display:flex; flex-direction:column;
-      justify-content:space-between;
-    }
-    .info-box h3{color:var(--accent); font-size:2rem; margin-bottom:1.5rem; font-weight:700;}
-    .info-item{margin-bottom:1.5rem;}
+    .showroom{padding:50px 0;background:var(--white);}
+    .showroom-grid{display:grid;grid-template-columns:1fr 1fr;gap:25px;align-items:stretch;}
+    .info-box{background:var(--ink);color:var(--white);padding:30px;border-radius:var(--radius);display:flex;flex-direction:column;justify-content:space-between;}
+    .info-box h3{color:var(--accent);font-size:2rem;margin-bottom:1.5rem;font-weight:700;}
+    .info-item{margin-bottom:1.5rem;font-size:1.05rem;line-height:1.7;color:#ffffff;}
     .info-item:last-of-type{margin-bottom:0;}
-    .info-item strong{display:block; color:var(--accent); margin-bottom:0.5rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:700;} 
-    .info-item a{color:inherit; border-bottom:1px solid rgba(255,255,255,0.3); font-size:1.05rem; font-weight:600;}
-    .info-item{font-size:1.05rem; line-height:1.7;} 
-    .info-box, .info-item, .info-item a { color: #ffffff; }
-    
-    .zone-text{
-      background:rgba(255,255,255,0.08); padding:15px; border-radius:4px;
-      font-size:0.95rem; line-height:1.6; border-left:4px solid var(--accent);
-      margin-top: 0.5rem;
-    }
-    
-    .showroom-images-stack {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        border-radius: var(--radius);
-        overflow: hidden; 
-        box-shadow:0 10px 30px rgba(0,0,0,0.1);
-    }
-
-    .showroom-images-stack img {
-        width: 100%;
-        height: 50%;
-        object-fit: cover; 
-        display: block;
-    }
-    
-    .map-box{ 
-      grid-column: 1 / -1; 
-      height: 300px; 
-      border-radius:var(--radius); overflow:hidden; 
-      margin-top: 20px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.1);
-    }
-    .map-box iframe{ width:100%; height:100%; border:none; }
+    .info-item strong{display:block;color:var(--accent);margin-bottom:0.5rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;}
+    .info-item a{color:#ffffff;border-bottom:1px solid rgba(255,255,255,0.3);font-size:1.05rem;font-weight:600;}
+    .zone-text{background:rgba(255,255,255,0.08);padding:15px;border-radius:4px;font-size:0.95rem;line-height:1.6;border-left:4px solid var(--accent);margin-top:0.5rem;}
+    .showroom-images-stack{display:flex;flex-direction:column;gap:0;border-radius:var(--radius);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
+    .showroom-images-stack img{width:100%;height:50%;object-fit:cover;display:block;}
+    .map-box{grid-column:1/-1;height:300px;border-radius:var(--radius);overflow:hidden;margin-top:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
+    .map-box iframe{width:100%;height:100%;border:none;}
 
     /* GALERIE */
-    .gallery-section{padding:80px 0; background:var(--cream);}
-    .gallery-grid{
-      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); 
-      gap:20px;
-    }
-    .gallery-item{
-      overflow:hidden; border-radius:var(--radius); position:relative;
-      border:1px solid rgba(0,0,0,0.05);
-      box-shadow:0 5px 15px rgba(0,0,0,0.05);
-      cursor:pointer;
-    }
-    .gallery-item img{
-      width:100%; height:auto; 
-      display:block; transition:transform 0.5s ease;
-    }
-    .gallery-item:hover img{transform:scale(1.05);} 
+    .gallery-section{padding:80px 0;background:var(--cream);}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
+    .gallery-item{overflow:hidden;border-radius:var(--radius);position:relative;border:1px solid rgba(0,0,0,0.05);box-shadow:0 5px 15px rgba(0,0,0,0.05);cursor:pointer;}
+    .gallery-item img{width:100%;height:auto;display:block;transition:transform 0.5s ease;}
+    .gallery-item:hover img{transform:scale(1.05);}
 
     /* TÉMOIGNAGES */
-    .testimonials{
-      padding:80px 0;
-      background:var(--white);
-    }
-    .testimonials-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
-      gap:30px;
-      margin-top:50px;
-    }
-    .testimonial-card{
-      background:var(--card-bg);
-      padding:30px;
-      border-radius:var(--radius);
-      border-left:4px solid var(--accent);
-      box-shadow:0 5px 15px rgba(0,0,0,0.05);
-      transition:0.3s;
-    }
-    .testimonial-card:hover{
-      transform:translateY(-5px);
-      box-shadow:0 10px 25px rgba(0,0,0,0.1);
-    }
-    .testimonial-text{
-      font-size:1.05rem;
-      line-height:1.7;
-      color:#333;
-      font-style:italic;
-      margin-bottom:20px;
-    }
-    .testimonial-author{
-      display:flex;
-      align-items:center;
-      gap:15px;
-    }
-    .testimonial-avatar{
-      width:50px;
-      height:50px;
-      border-radius:50%;
-      background:var(--accent);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      font-size:1.2rem;
-      color:#fff;
-    }
-    .testimonial-info{
-      flex:1;
-    }
-    .testimonial-name{
-      font-weight:700;
-      color:var(--ink);
-      margin-bottom:3px;
-    }
-    .testimonial-location{
-      font-size:0.9rem;
-      color:var(--muted);
-    }
-    .stars{
-      color:#ffc107;
-      font-size:1.1rem;
-      margin-bottom:15px;
-    }
+    .testimonials{padding:80px 0;background:var(--white);}
+    .testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-top:50px;}
+    .testimonial-card{background:var(--card-bg);padding:30px;border-radius:var(--radius);border-left:4px solid var(--accent);box-shadow:0 5px 15px rgba(0,0,0,0.05);transition:0.3s;}
+    .testimonial-card:hover{transform:translateY(-5px);box-shadow:0 10px 25px rgba(0,0,0,0.1);}
+    .testimonial-text{font-size:1.05rem;line-height:1.7;color:#333;font-style:italic;margin-bottom:20px;}
+    .testimonial-author{display:flex;align-items:center;gap:15px;}
+    .testimonial-avatar{width:50px;height:50px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#fff;}
+    .testimonial-name{font-weight:700;color:var(--ink);margin-bottom:3px;}
+    .testimonial-location{font-size:0.9rem;color:var(--muted);}
+    .stars{color:#ffc107;font-size:1.1rem;margin-bottom:15px;}
 
     /* FORMULAIRE */
-    .contact-section{padding:80px 0; background:var(--white);}
-    form{
-      max-width:750px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:25px;
-      background:var(--cream); padding:40px; border-radius:var(--radius);
-      border:1px solid #eee;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    }
-    label{font-weight:700; font-size:0.9rem; margin-bottom:5px; display:block;}
-    input, textarea{
-      width:100%; padding:12px; border:1px solid #ccc; border-radius:4px;
-      font-family:inherit; font-size:1rem; background:#fff; transition:0.3s;
-    }
-    input:focus, textarea:focus{outline:none; border-color:var(--ink); box-shadow:0 0 0 3px rgba(5,30,53,0.1);}
+    .contact-section{padding:80px 0;background:var(--white);}
+    form{max-width:750px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:25px;background:var(--cream);padding:40px;border-radius:var(--radius);border:1px solid #eee;box-shadow:0 5px 20px rgba(0,0,0,0.05);}
+    label{font-weight:700;font-size:0.9rem;margin-bottom:5px;display:block;}
+    input,textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:1rem;background:#fff;transition:0.3s;}
+    input:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(5,30,53,0.1);}
     .full-width{grid-column:1/-1;}
-    
-    /* Footer */
-    footer{background:var(--ink); color:var(--white); padding:60px 0 30px; text-align:center; font-size:0.9rem;}
-    footer p {opacity:0.7; margin-top:10px; color: #ffffff;}
-    .footer-links a{margin:0 10px; color:#aaa; text-decoration:none;}
-    .footer-links a:hover{color:var(--white);}
-    
-    .footer-logo-box{
-      background-color: var(--cream); 
-      width: 100px; height: 100px; 
-      border-radius: 50%; 
-      margin: 0 auto 20px; 
-      display: flex; align-items: center; justify-content: center; 
-      overflow: hidden; padding: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
 
-    /* Scroll Flèche */
-    .scroll-indicator {
-      position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:99;
-      opacity:1; transition:opacity 0.4s; pointer-events:none;
-    }
+    /* FOOTER */
+    footer{background:var(--ink);color:var(--white);padding:60px 0 30px;text-align:center;font-size:0.9rem;}
+    footer p{opacity:0.7;margin-top:10px;color:#ffffff;}
+    .footer-links a{margin:0 10px;color:#aaa;text-decoration:none;}
+    .footer-links a:hover{color:var(--white);}
+    .footer-logo-box{background-color:var(--cream);width:100px;height:100px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+
+    /* SCROLL */
+    .scroll-indicator{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:99;opacity:1;transition:opacity 0.4s;pointer-events:none;}
     body.scrolled .scroll-indicator{opacity:0;}
-    .arrow-down {
-      width:20px; height:20px; border-bottom:3px solid var(--ink); border-right:3px solid var(--ink);
-      transform:rotate(45deg); animation:bounce 2s infinite;
-    }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {transform:translateY(0) rotate(45deg);}
-      40% {transform:translateY(-10px) rotate(45deg);}
-      60% {transform:translateY(-5px) rotate(45deg);}
-    }
+    .arrow-down{width:20px;height:20px;border-bottom:3px solid var(--ink);border-right:3px solid var(--ink);transform:rotate(45deg);animation:bounce 2s infinite;}
+    @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0) rotate(45deg);}40%{transform:translateY(-10px) rotate(45deg);}60%{transform:translateY(-5px) rotate(45deg);}}
+
+    /* MODALS */
+    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.active{display:flex;}
+    .modal-box{background:var(--white);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;border-radius:var(--radius);padding:40px;position:relative;}
+    .modal-box h2{font-size:1.8rem;margin-bottom:1.5rem;color:var(--ink);border-bottom:2px solid var(--accent);padding-bottom:10px;}
+    .modal-box p{margin-bottom:1.2rem;font-size:0.95rem;color:#444;line-height:1.7;}
+    .modal-close{position:absolute;top:15px;right:20px;background:none;border:none;font-size:2rem;cursor:pointer;color:var(--muted);line-height:1;}
+    .modal-close:hover{color:var(--ink);}
 
     /* RESPONSIVE */
     @media(max-width:900px){
-      .hero .grid, .about-grid{grid-template-columns:1fr;}
-      .showroom-grid{grid-template-columns:1fr; gap: 20px;} 
+      .hero .grid,.about-grid{grid-template-columns:1fr;}
+      .showroom-grid{grid-template-columns:1fr;gap:20px;}
       .services-grid{grid-template-columns:1fr;}
       .testimonials-grid{grid-template-columns:1fr;}
-      .menu{display:none; position:absolute; top:100px; left:0; width:100%; background:var(--cream); flex-direction:column; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); border-bottom:1px solid #eee;}
-      .menu.active{display:flex;}
-      .menu-toggle{display:flex;}
-      .hero{padding-top:40px; padding-bottom:60px;}
-      .hero-img-box{order:-1; height:200px; box-shadow: 10px 10px 0px var(--ink);}
-      .hero-img-box img{ transform: none; object-position: 50% 50%; object-fit: contain; } 
+      .menu{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;padding:10px 20px;}
+      .menu a{font-size:0.8rem;padding:6px 0;}
+      .hero{padding-top:40px;padding-bottom:60px;}
+      .hero-img-box{order:-1;height:200px;box-shadow:10px 10px 0px var(--ink);}
       .title{font-size:2.5rem;}
       .title-sub{font-size:1.5rem;}
-      form{grid-template-columns:1fr; padding:20px;}
-      .map-box{ margin-top: 20px; height: 250px;}
+      form{grid-template-columns:1fr;padding:20px;}
+      .map-box{margin-top:20px;height:250px;}
+      .nav{height:auto;padding:10px 0;flex-direction:column;gap:0;}
+      .logo-img{height:80px;}
     }
   </style>
 </head>
@@ -429,8 +182,6 @@
       <a href="#">
         <img src="https://i.imgur.com/0afu8KT.jpeg" alt="Méridienne Logo" class="logo-img">
       </a>
-      
-      <div class="menu-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
       <nav class="menu" id="mainMenu">
         <a href="#about">L'Artisan</a>
         <a href="#services">Savoir-faire</a>
@@ -449,17 +200,15 @@
           <span class="title-sub">Saint-Gilles-Croix-de-Vie</span>
         </h1>
         <p class="lead">Restauration de mobilier, rideaux sur mesure et tissus d'éditeurs. Un savoir-faire d'exception pour vos intérieurs.</p>
-        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+        <div style="display:flex;gap:15px;flex-wrap:wrap;">
           <a href="#contact" class="btn">Demander un devis</a>
           <a href="#showroom" class="btn btn-ghost">Voir le showroom</a>
         </div>
       </div>
-      
       <div class="hero-img-box">
         <img src="https://i.imgur.com/O4sZKGk.png" alt="Devanture du Showroom Méridienne">
       </div>
     </div>
-    
     <div class="scroll-indicator"><div class="arrow-down"></div></div>
   </section>
 
@@ -485,38 +234,13 @@
         <h2>Nos Savoir-Faire</h2>
         <p>Tradition ou Modernité : c'est vous qui choisissez.</p>
       </div>
-      
       <div class="services-grid">
-        <div class="service-card">
-          <span class="icon">🪑</span>
-          <h3>Restauration de Sièges</h3>
-          <p>Fauteuils, chaises, canapés de style moderne ou ancien. Choix possible entre une confection traditionnelle (crin, ressorts) ou moderne (mousse haute résilience).</p>
-        </div>
-        <div class="service-card">
-          <span class="icon">🪟</span>
-          <h3>Rideaux & Stores</h3>
-          <p>Confection sur mesure de rideaux, voilages, stores intérieurs et parois japonaises. Nous assurons également l'installation des tringles et mécanismes.</p>
-        </div>
-        <div class="service-card">
-          <span class="icon">🎨</span>
-          <h3>Tissus d'Éditeur</h3>
-          <p>Large choix de tissus d'ameublement. Partenaire privilégié de la <strong>Maison Lelièvre</strong> et distributeur des Maisons <strong>Pierre Frey</strong> et <strong>Casal</strong>.</p>
-        </div>
-        <div class="service-card">
-          <span class="icon">🪵</span>
-          <h3>Restauration des Bois</h3>
-          <p>Remise en état des boiseries de vos sièges : nettoyage, traitement, teinte, vernis au tampon ou laque de couleur selon vos envies.</p>
-        </div>
-        <div class="service-card">
-          <span class="icon">✂️</span>
-          <h3>Confection de Coussins</h3>
-          <p>Réalisation de coussins décoratifs ou d'assise, avec finitions soignées (passepoil, fermeture éclair invisible) pour harmoniser votre décoration.</p>
-        </div>
-        <div class="service-card">
-          <span class="icon">📐</span>
-          <h3>Découpe de Mousse</h3>
-          <p>Découpe de mousse sur mesure pour la réfection d'intérieurs de coussins, de banquettes ou de matelas, avec différentes densités disponibles.</p>
-        </div>
+        <div class="service-card"><span class="icon">🪑</span><h3>Restauration de Sièges</h3><p>Fauteuils, chaises, canapés de style moderne ou ancien. Choix possible entre une confection traditionnelle (crin, ressorts) ou moderne (mousse haute résilience).</p></div>
+        <div class="service-card"><span class="icon">🪟</span><h3>Rideaux & Stores</h3><p>Confection sur mesure de rideaux, voilages, stores intérieurs et parois japonaises. Nous assurons également l'installation des tringles et mécanismes.</p></div>
+        <div class="service-card"><span class="icon">🎨</span><h3>Tissus d'Éditeur</h3><p>Large choix de tissus d'ameublement. Partenaire privilégié de la <strong>Maison Lelièvre</strong> et distributeur des Maisons <strong>Pierre Frey</strong> et <strong>Casal</strong>.</p></div>
+        <div class="service-card"><span class="icon">🪵</span><h3>Restauration des Bois</h3><p>Remise en état des boiseries de vos sièges : nettoyage, traitement, teinte, vernis au tampon ou laque de couleur selon vos envies.</p></div>
+        <div class="service-card"><span class="icon">✂️</span><h3>Confection de Coussins</h3><p>Réalisation de coussins décoratifs ou d'assise, avec finitions soignées (passepoil, fermeture éclair invisible) pour harmoniser votre décoration.</p></div>
+        <div class="service-card"><span class="icon">📐</span><h3>Découpe de Mousse</h3><p>Découpe de mousse sur mesure pour la réfection d'intérieurs de coussins, de banquettes ou de matelas, avec différentes densités disponibles.</p></div>
       </div>
     </div>
   </section>
@@ -533,40 +257,18 @@
         <h2>Showroom & Atelier</h2>
         <p>Venez découvrir les tissus et discuter de votre projet.</p>
       </div>
-      
       <div class="showroom-grid">
         <div class="info-box">
           <h3>Méridienne</h3>
-          
-          <div class="info-item">
-            <strong>📍 Adresse</strong>
-            32 Boulevard de l'Égalité<br>
-            85800 Saint-Gilles-Croix-de-Vie
-          </div>
-          
-          <div class="info-item">
-            <strong>🕒 Horaires</strong>
-            Mardi au Samedi : 9h30 - 12h / 14h - 19h
-          </div>
-          
-          <div class="info-item">
-            <strong>📞 Contact</strong>
-            Fixe : <a href="tel:0251351872">02 51 35 18 72</a><br>
-            Mail: meridienne.tapissier@orange.fr
-          </div>
-
-          <div class="info-item zone-text">
-            <strong>🗺️ Zone d'intervention</strong>
-            À la suite d'un premier échange au showroom, appuyé par des photos, un déplacement est possible à votre domicile sur :<br>
-            St-Gilles, St-Hilaire, Brétignolles, Le Fenouiller, Challans, Les Sables d'Olonne, etc...
-          </div>
+          <div class="info-item"><strong>📍 Adresse</strong>32 Boulevard de l'Égalité<br>85800 Saint-Gilles-Croix-de-Vie</div>
+          <div class="info-item"><strong>🕒 Horaires</strong>Mardi au Samedi : 9h30 - 12h / 14h - 19h</div>
+          <div class="info-item"><strong>📞 Contact</strong>Fixe : <a href="tel:0251351872">02 51 35 18 72</a><br><a href="mailto:meridienne.tapissier@orange.fr" style="margin-top:5px;display:inline-block">meridienne.tapissier@orange.fr</a></div>
+          <div class="info-item zone-text"><strong>🗺️ Zone d'intervention</strong>À la suite d'un premier échange au showroom, appuyé par des photos, un déplacement est possible à votre domicile sur :<br>St-Gilles, St-Hilaire, Brétignolles, Le Fenouiller, Challans, Les Sables d'Olonne, etc...</div>
         </div>
-        
         <div class="showroom-images-stack">
           <img src="https://i.imgur.com/JJDkHKy.jpeg" alt="Intérieur du showroom Méridienne avec les tissus">
           <img src="https://i.imgur.com/8KTjkIs.jpeg" alt="Intérieur du showroom Méridienne avec des réalisations">
         </div>
-
         <div class="map-box">
           <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2719.5678901234!2d-1.9376543!3d46.6964567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4805d6e8a8a8a8a8%3A0x1234567890abcdef!2s32%20Boulevard%20de%20l'%C3%89galit%C3%A9%2C%2085800%20Saint-Gilles-Croix-de-Vie!5e0!3m2!1sfr!2sfr!4v1234567890123!5m2!1sfr!2sfr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
@@ -576,7 +278,7 @@
 
   <section class="gallery-section">
     <div class="container">
-      <h2 style="text-align:center; margin-bottom:40px;">Quelques restaurations récentes</h2>
+      <h2 style="text-align:center;margin-bottom:40px;">Quelques restaurations récentes</h2>
       <div class="gallery-grid">
         <div class="gallery-item" onclick="openLightbox(this)"><img src="https://i.imgur.com/Kfuio65.jpeg" alt="Réalisation de fauteuil restauré"></div>
         <div class="gallery-item" onclick="openLightbox(this)"><img src="https://i.imgur.com/ViIzmZV.jpeg" alt="Réalisation de canapé restauré"></div>
@@ -593,7 +295,7 @@
 
   <section class="gallery-section" style="background:var(--white);">
     <div class="container">
-      <h2 style="text-align:center; margin-bottom:40px;">Secrets d'Atelier & Finitions</h2>
+      <h2 style="text-align:center;margin-bottom:40px;">Secrets d'Atelier & Finitions</h2>
       <div class="gallery-grid">
         <div class="gallery-item" onclick="openLightbox(this)"><img src="https://i.imgur.com/2C5jvvs.jpeg" alt="Structure interne d'un fauteuil"></div>
         <div class="gallery-item" onclick="openLightbox(this)"><img src="https://i.imgur.com/irk0pvj.jpeg" alt="Finitions clous décoratifs"></div>
@@ -610,42 +312,21 @@
         <h2>Ils nous font confiance</h2>
         <p>L'avis de nos clients sur notre travail.</p>
       </div>
-      
       <div class="testimonials-grid">
         <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Travail impeccable sur la restauration de mon fauteuil Louis XV. Cédric a su respecter l'authenticité du meuble tout en lui redonnant une seconde jeunesse. Je recommande vivement !"</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">MC</div>
-            <div class="testimonial-info">
-              <div class="testimonial-name">Marie-Claire D.</div>
-              <div class="testimonial-location">Saint-Hilaire-de-Riez</div>
-            </div>
-          </div>
+          <div class="testimonial-author"><div class="testimonial-avatar">MC</div><div><div class="testimonial-name">Marie-Claire D.</div><div class="testimonial-location">Saint-Hilaire-de-Riez</div></div></div>
         </div>
-
         <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Nos rideaux sur mesure sont magnifiques ! Le choix des tissus était vaste et les conseils de qualité. Installation rapide et soignée. Un vrai professionnel !"</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">JL</div>
-            <div class="testimonial-info">
-              <div class="testimonial-name">Jean-Louis B.</div>
-              <div class="testimonial-location">Saint-Gilles-Croix-de-Vie</div>
-            </div>
-          </div>
+          <div class="testimonial-author"><div class="testimonial-avatar">JL</div><div><div class="testimonial-name">Jean-Louis B.</div><div class="testimonial-location">Saint-Gilles-Croix-de-Vie</div></div></div>
         </div>
-
         <div class="testimonial-card">
           <div class="stars">★★★★★</div>
           <p class="testimonial-text">"Excellente expérience. Mon canapé ancien a retrouvé tout son éclat. Le travail est minutieux et le résultat dépasse mes attentes. Merci pour votre passion !"</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">SF</div>
-            <div class="testimonial-info">
-              <div class="testimonial-name">Sophie F.</div>
-              <div class="testimonial-location">Brétignolles-sur-Mer</div>
-            </div>
-          </div>
+          <div class="testimonial-author"><div class="testimonial-avatar">SF</div><div><div class="testimonial-name">Sophie F.</div><div class="testimonial-location">Brétignolles-sur-Mer</div></div></div>
         </div>
       </div>
     </div>
@@ -656,28 +337,13 @@
       <div class="section-header">
         <h2>Parlez-nous de votre projet</h2>
       </div>
-
       <form action="https://formspree.io/f/xdawdbee" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_next" value="merci.html">
-        <div class="full-width">
-          <label>Nom complet</label>
-          <input type="text" name="name" required placeholder="Votre nom">
-        </div>
-        <div>
-          <label>Email</label>
-          <input type="email" name="email" required placeholder="email@exemple.com">
-        </div>
-        <div>
-          <label>Téléphone</label>
-          <input type="tel" name="phone" placeholder="06 00 00 00 00">
-        </div>
-        <div class="full-width">
-          <label>Votre message (Type de meuble, dimensions...)</label>
-          <textarea name="message" rows="5" required placeholder="Bonjour, je voudrais restaurer un fauteuil Voltaire..."></textarea>
-        </div>
-        <div class="full-width" style="text-align:center; margin-top:20px;">
-          <button type="submit" class="btn" style="width:100%;">Envoyer ma demande</button>
-        </div>
+        <div class="full-width"><label>Nom complet</label><input type="text" name="name" required placeholder="Votre nom"></div>
+        <div><label>Email</label><input type="email" name="email" required placeholder="email@exemple.com"></div>
+        <div><label>Téléphone</label><input type="tel" name="phone" placeholder="06 00 00 00 00"></div>
+        <div class="full-width"><label>Votre message (Type de meuble, dimensions...)</label><textarea name="message" rows="5" required placeholder="Bonjour, je voudrais restaurer un fauteuil Voltaire..."></textarea></div>
+        <div class="full-width" style="text-align:center;margin-top:20px;"><button type="submit" class="btn" style="width:100%;">Envoyer ma demande</button></div>
       </form>
     </div>
   </section>
@@ -685,37 +351,79 @@
   <footer>
     <div class="container">
       <div class="footer-logo-box">
-        <img src="https://i.imgur.com/0afu8KT.jpeg" alt="Logo" style="height:100%; width:auto;">
+        <img src="https://i.imgur.com/0afu8KT.jpeg" alt="Logo" style="height:100%;width:auto;">
       </div>
-      
       <p>© <span id="year"></span> Méridienne — Cédric Rainssant</p>
       <div class="footer-links">
-        <a href="#">Mentions Légales</a> •
-        <a href="#">Politique de Confidentialité</a>
+        <a href="#" onclick="openModal('modal-mentions');return false;">Mentions Légales</a> •
+        <a href="#" onclick="openModal('modal-confidentialite');return false;">Politique de Confidentialité</a>
       </div>
     </div>
   </footer>
 
+  <!-- MODAL MENTIONS LÉGALES -->
+  <div id="modal-mentions" class="modal-overlay" onclick="closeModal('modal-mentions')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal('modal-mentions')">×</button>
+      <h2>Mentions Légales</h2>
+      <p><strong>Éditeur du site</strong><br>Cédric Rainssant — Méridienne<br>32 Boulevard de l'Égalité<br>85800 Saint-Gilles-Croix-de-Vie<br>Tél. : 02 51 35 18 72<br>Email : meridienne.tapissier@orange.fr</p>
+      <p><strong>Activité</strong><br>Artisan Tapissier Décorateur — Entreprise individuelle</p>
+      <p><strong>Hébergement</strong><br>GitHub Pages — GitHub, Inc.<br>88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis</p>
+      <p><strong>Propriété intellectuelle</strong><br>L'ensemble du contenu de ce site (textes, photos, logo) est la propriété exclusive de Cédric Rainssant. Toute reproduction, même partielle, est interdite sans autorisation préalable.</p>
+      <p><strong>Responsabilité</strong><br>L'éditeur s'efforce de maintenir les informations publiées à jour mais ne peut garantir l'exactitude ou l'exhaustivité des contenus.</p>
+    </div>
+  </div>
 
+  <!-- MODAL POLITIQUE DE CONFIDENTIALITÉ -->
+  <div id="modal-confidentialite" class="modal-overlay" onclick="closeModal('modal-confidentialite')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal('modal-confidentialite')">×</button>
+      <h2>Politique de Confidentialité</h2>
+      <p><strong>Données collectées</strong><br>Lors de l'envoi du formulaire de contact, les données suivantes sont collectées : nom, adresse email, numéro de téléphone et message. Ces données sont utilisées uniquement pour répondre à votre demande.</p>
+      <p><strong>Destinataire des données</strong><br>Les données transmises via le formulaire sont acheminées par le service Formspree vers la messagerie de Méridienne. Elles ne sont ni revendues, ni transmises à des tiers.</p>
+      <p><strong>Durée de conservation</strong><br>Les données sont conservées le temps nécessaire au traitement de votre demande, puis supprimées.</p>
+      <p><strong>Vos droits</strong><br>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Contact : meridienne.tapissier@orange.fr</p>
+      <p><strong>Cookies</strong><br>Ce site n'utilise pas de cookies de tracking ou publicitaires.</p>
+    </div>
+  </div>
+
+  <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    function toggleMenu(){
-      document.getElementById('mainMenu').classList.toggle('active');
-    }
-    document.querySelectorAll('.menu a').forEach(l => l.addEventListener('click', () => {
-      document.getElementById('mainMenu').classList.remove('active');
-    }));
 
     window.addEventListener('scroll', () => {
       if(window.scrollY > 100) document.body.classList.add('scrolled');
       else document.body.classList.remove('scrolled');
     });
 
-    // LIGHTBOX
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
     function openLightbox(element) {
       const img = element.querySelector('img');
-      const lightbox = document.getElementById('lightbox');
-      const lightboxImg = document.getElementById('lightbox-img');
-      lightboxImg.src = img.src;
-      lightboxImg.alt = img.alt;
-      ligh
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox-img').alt = img.alt;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+        closeLightbox();
+        document.body.style.overflow = '';
+      }
+    });
+  </script>
+
+</body>
+</html>
