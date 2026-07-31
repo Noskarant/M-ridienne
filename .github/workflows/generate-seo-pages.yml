@@ -1,14 +1,10 @@
 name: Generate SEO pages
 
-# Generates the reviewed static pages and validates the SEO output.
 on:
-  push:
+  pull_request:
     branches:
       - main
-    paths:
-      - generate_seo_pages.py
-      - seo_payload/**
-      - .github/workflows/generate-seo-pages.yml
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
@@ -16,10 +12,14 @@ permissions:
 
 jobs:
   generate:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out pull request branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,4 +42,4 @@ jobs:
             exit 0
           fi
           git commit -m "feat(seo): add local service and location pages"
-          git push origin main
+          git push origin HEAD:${{ github.head_ref }}
