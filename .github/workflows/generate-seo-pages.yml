@@ -1,0 +1,44 @@
+name: Generate SEO pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - generate_seo_pages.py
+      - seo_payload/**
+      - .github/workflows/generate-seo-pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate pages
+        run: python generate_seo_pages.py
+
+      - name: Validate SEO output
+        run: python scripts/check_seo.py
+
+      - name: Commit generated pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets services zones robots.txt sitemap.xml merci.html scripts/check_seo.py
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git commit -m "feat(seo): add local service and location pages"
+          git push origin main
