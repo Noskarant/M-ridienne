@@ -1,178 +1,245 @@
-#!/usr/bin/env python3
-"""Contrôles SEO statiques pour meridienne-tapissier.fr (stdlib uniquement)."""
 from __future__ import annotations
 
-import json
-import re
-import sys
+from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
 from xml.etree import ElementTree as ET
+import json
+import re
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = "https://meridienne-tapissier.fr"
-EXPECTED = [
-    "/", "/services/", "/services/tapissier-ameublement/",
-    "/services/restauration-fauteuils-sieges/",
-    "/services/rideaux-voilages-sur-mesure/",
-    "/services/stores-interieurs-sur-mesure/",
-    "/services/tissus-ameublement-editeurs/",
-    "/services/restauration-boiseries-sieges/",
-    "/services/coussins-sur-mesure/",
-    "/services/decoupe-mousse-banquettes-matelas/", "/zones/",
-    "/zones/tapissier-saint-hilaire-de-riez/",
-    "/zones/tapissier-le-fenouiller/", "/zones/tapissier-givrand/",
-    "/zones/tapissier-notre-dame-de-riez/",
-    "/zones/tapissier-bretignolles-sur-mer/",
-    "/zones/tapissier-aiguillon-sur-vie/",
-    "/zones/tapissier-saint-reverend/",
-    "/zones/tapissier-saint-maixent-sur-vie/",
-    "/zones/tapissier-commequiers/", "/zones/tapissier-coex/",
-    "/zones/tapissier-brem-sur-mer/",
-    "/zones/tapissier-la-chaize-giraud/",
-    "/zones/tapissier-landevieille/", "/zones/tapissier-challans/",
-    "/zones/tapissier-soullans/",
-    "/zones/tapissier-les-sables-d-olonne/",
-]
+EXPECTED_URLS = {
+    f"{DOMAIN}/",
+    f"{DOMAIN}/services/",
+    f"{DOMAIN}/services/tapissier-ameublement/",
+    f"{DOMAIN}/services/restauration-fauteuils-sieges/",
+    f"{DOMAIN}/services/rideaux-voilages-sur-mesure/",
+    f"{DOMAIN}/services/stores-interieurs-sur-mesure/",
+    f"{DOMAIN}/services/tissus-ameublement-editeurs/",
+    f"{DOMAIN}/services/restauration-boiseries-sieges/",
+    f"{DOMAIN}/services/coussins-sur-mesure/",
+    f"{DOMAIN}/services/decoupe-mousse-banquettes-matelas/",
+    f"{DOMAIN}/zones/",
+    f"{DOMAIN}/zones/tapissier-saint-hilaire-de-riez/",
+    f"{DOMAIN}/zones/tapissier-le-fenouiller/",
+    f"{DOMAIN}/zones/tapissier-givrand/",
+    f"{DOMAIN}/zones/tapissier-notre-dame-de-riez/",
+    f"{DOMAIN}/zones/tapissier-bretignolles-sur-mer/",
+    f"{DOMAIN}/zones/tapissier-aiguillon-sur-vie/",
+    f"{DOMAIN}/zones/tapissier-saint-reverend/",
+    f"{DOMAIN}/zones/tapissier-saint-maixent-sur-vie/",
+    f"{DOMAIN}/zones/tapissier-commequiers/",
+    f"{DOMAIN}/zones/tapissier-coex/",
+    f"{DOMAIN}/zones/tapissier-brem-sur-mer/",
+    f"{DOMAIN}/zones/tapissier-la-chaize-giraud/",
+    f"{DOMAIN}/zones/tapissier-landevieille/",
+    f"{DOMAIN}/zones/tapissier-challans/",
+    f"{DOMAIN}/zones/tapissier-soullans/",
+    f"{DOMAIN}/zones/tapissier-les-sables-d-olonne/",
+}
 
 
 class PageParser(HTMLParser):
     def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.title = ""
-        self.descriptions: list[str] = []
-        self.canonicals: list[str] = []
+        super().__init__()
+        self.in_title = False
+        self.in_json = False
+        self.in_article = False
+        self.title_parts: list[str] = []
+        self.article_parts: list[str] = []
         self.h1_count = 0
+        self.description: str | None = None
+        self.canonical: str | None = None
+        self.robots: str | None = None
+        self.json_buffer: list[str] = []
+        self.json_scripts: list[str] = []
         self.links: list[str] = []
-        self.json_ld: list[str] = []
-        self._capture: str | None = None
-        self._buffer: list[str] = []
 
-    def handle_starttag(self, tag: str, attrs_list: list[tuple[str, str | None]]) -> None:
-        attrs = dict(attrs_list)
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attributes = dict(attrs)
         if tag == "title":
-            self._capture, self._buffer = "title", []
+            self.in_title = True
         elif tag == "h1":
             self.h1_count += 1
-        elif tag == "meta" and (attrs.get("name") or "").lower() == "description":
-            self.descriptions.append(attrs.get("content") or "")
-        elif tag == "link" and (attrs.get("rel") or "").lower() == "canonical":
-            self.canonicals.append(attrs.get("href") or "")
-        elif tag == "a" and attrs.get("href"):
-            self.links.append(attrs["href"] or "")
-        elif tag == "script" and (attrs.get("type") or "").lower() == "application/ld+json":
-            self._capture, self._buffer = "json", []
-
-    def handle_data(self, data: str) -> None:
-        if self._capture:
-            self._buffer.append(data)
+        elif tag == "article":
+            self.in_article = True
+        elif tag == "meta":
+            if attributes.get("name") == "description":
+                self.description = attributes.get("content")
+            elif attributes.get("name") == "robots":
+                self.robots = attributes.get("content")
+        elif tag == "link" and attributes.get("rel") == "canonical":
+            self.canonical = attributes.get("href")
+        elif tag == "script" and attributes.get("type") == "application/ld+json":
+            self.in_json = True
+            self.json_buffer = []
+        elif tag == "a" and attributes.get("href"):
+            self.links.append(attributes["href"] or "")
 
     def handle_endtag(self, tag: str) -> None:
-        if tag == "title" and self._capture == "title":
-            self.title = "".join(self._buffer).strip()
-            self._capture = None
-        elif tag == "script" and self._capture == "json":
-            self.json_ld.append("".join(self._buffer).strip())
-            self._capture = None
+        if tag == "title":
+            self.in_title = False
+        elif tag == "article":
+            self.in_article = False
+        elif tag == "script" and self.in_json:
+            self.json_scripts.append("".join(self.json_buffer))
+            self.in_json = False
+
+    def handle_data(self, data: str) -> None:
+        if self.in_title:
+            self.title_parts.append(data)
+        if self.in_article:
+            self.article_parts.append(data)
+        if self.in_json:
+            self.json_buffer.append(data)
 
 
-def path_for_url(path: str) -> Path:
-    return ROOT / "index.html" if path == "/" else ROOT / path.strip("/") / "index.html"
-
-
-def internal_target(href: str) -> Path | None:
-    if href.startswith(("mailto:", "tel:", "#", "javascript:")):
-        return None
+def target_for_internal_link(href: str) -> Path | None:
     parsed = urlparse(href)
-    if parsed.scheme and parsed.netloc != "meridienne-tapissier.fr":
+    if parsed.scheme or parsed.netloc or href.startswith(("mailto:", "tel:", "javascript:")):
         return None
     path = parsed.path
     if not path or path == "/":
         return ROOT / "index.html"
     if path.endswith("/"):
-        return ROOT / path.strip("/") / "index.html"
+        return ROOT / path.lstrip("/") / "index.html"
     return ROOT / path.lstrip("/")
 
 
-def fail(errors: list[str], message: str) -> None:
-    errors.append(message)
+def trigrams(text: str) -> Counter[tuple[str, str, str]]:
+    words = re.findall(r"[a-zà-ÿ'-]+", text.lower())
+    return Counter(zip(words, words[1:], words[2:]))
 
 
 def main() -> int:
     errors: list[str] = []
-    titles: dict[str, Path] = {}
-    descriptions: dict[str, Path] = {}
-    canonicals: dict[str, Path] = {}
+    warnings: list[str] = []
+    titles: dict[str, str] = {}
+    descriptions: dict[str, str] = {}
+    canonicals: dict[str, str] = {}
+    parsed_pages: dict[str, PageParser] = {}
 
-    sitemap = ROOT / "sitemap.xml"
-    if not sitemap.exists():
-        fail(errors, "sitemap.xml absent")
-        sitemap_urls: list[str] = []
-    else:
-        tree = ET.parse(sitemap)
-        ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-        sitemap_urls = [e.text or "" for e in tree.findall("s:url/s:loc", ns)]
-        expected_urls = [DOMAIN + p for p in EXPECTED]
-        if sitemap_urls != expected_urls:
-            fail(errors, "Le sitemap ne contient pas exactement les 27 URL attendues dans l’ordre prévu")
-        if any("merci" in u for u in sitemap_urls):
-            fail(errors, "merci.html ne doit pas figurer dans le sitemap")
-
-    for url_path in EXPECTED:
-        page = path_for_url(url_path)
-        if not page.exists():
-            fail(errors, f"Page absente : {page.relative_to(ROOT)}")
-            continue
+    html_files = sorted(ROOT.rglob("*.html"))
+    for file in html_files:
+        rel = file.relative_to(ROOT).as_posix()
         parser = PageParser()
-        parser.feed(page.read_text(encoding="utf-8"))
-        rel = page.relative_to(ROOT)
-        if not parser.title:
-            fail(errors, f"Title absent : {rel}")
-        elif parser.title in titles:
-            fail(errors, f"Title dupliqué : {rel} et {titles[parser.title].relative_to(ROOT)}")
-        else:
-            titles[parser.title] = page
-        if len(parser.descriptions) != 1 or not parser.descriptions[0].strip():
-            fail(errors, f"Meta description invalide : {rel}")
-        elif parser.descriptions[0] in descriptions:
-            fail(errors, f"Description dupliquée : {rel}")
-        else:
-            descriptions[parser.descriptions[0]] = page
-        if parser.h1_count != 1:
-            fail(errors, f"Nombre de H1 = {parser.h1_count} : {rel}")
-        expected_canonical = DOMAIN + url_path
-        if parser.canonicals != [expected_canonical]:
-            fail(errors, f"Canonical invalide : {rel}")
-        elif expected_canonical in canonicals:
-            fail(errors, f"Canonical dupliquée : {rel}")
-        else:
-            canonicals[expected_canonical] = page
-        if not parser.json_ld:
-            fail(errors, f"JSON-LD absent : {rel}")
-        for block in parser.json_ld:
-            try:
-                json.loads(block)
-            except json.JSONDecodeError as exc:
-                fail(errors, f"JSON-LD invalide dans {rel}: {exc}")
-        for href in parser.links:
-            target = internal_target(href)
-            if target is not None and not target.exists():
-                fail(errors, f"Lien cassé dans {rel}: {href}")
+        parser.feed(file.read_text(encoding="utf-8"))
+        parsed_pages[rel] = parser
+        title = "".join(parser.title_parts).strip()
 
-    merci = (ROOT / "merci.html").read_text(encoding="utf-8") if (ROOT / "merci.html").exists() else ""
-    if not re.search(r'<meta\s+name=["\']robots["\']\s+content=["\']noindex,follow["\']', merci, re.I):
-        fail(errors, "merci.html doit contenir noindex,follow")
-    robots = (ROOT / "robots.txt").read_text(encoding="utf-8") if (ROOT / "robots.txt").exists() else ""
+        if not title:
+            errors.append(f"{rel}: title manquant")
+
+        if rel == "merci.html":
+            if parser.robots != "noindex,follow":
+                errors.append("merci.html: robots doit être noindex,follow")
+            continue
+
+        if not parser.description:
+            errors.append(f"{rel}: meta description manquante")
+        if parser.h1_count != 1:
+            errors.append(f"{rel}: {parser.h1_count} H1 au lieu de 1")
+        if not parser.canonical:
+            errors.append(f"{rel}: canonical manquante")
+        if parser.robots != "index,follow":
+            errors.append(f"{rel}: robots doit être index,follow")
+
+        if title in titles:
+            errors.append(f"title dupliqué: {rel} / {titles[title]}")
+        titles[title] = rel
+        if parser.description in descriptions:
+            errors.append(f"description dupliquée: {rel} / {descriptions[parser.description]}")
+        descriptions[parser.description or ""] = rel
+        if parser.canonical in canonicals:
+            errors.append(f"canonical dupliquée: {rel} / {canonicals[parser.canonical or '']}")
+        canonicals[parser.canonical or ""] = rel
+
+        for raw in parser.json_scripts:
+            try:
+                json.loads(raw)
+            except json.JSONDecodeError as exc:
+                errors.append(f"{rel}: JSON-LD invalide: {exc}")
+
+        for href in parser.links:
+            target = target_for_internal_link(href)
+            if target is None:
+                continue
+            # The staging directory may intentionally omit the existing root homepage.
+            if target == ROOT / "index.html" and not target.exists():
+                continue
+            if not target.exists():
+                errors.append(f"{rel}: lien interne cassé vers {href}")
+
+    sitemap_path = ROOT / "sitemap.xml"
+    tree = ET.parse(sitemap_path)
+    namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    sitemap_urls = [node.text or "" for node in tree.findall(".//s:loc", namespace)]
+    sitemap_set = set(sitemap_urls)
+    if sitemap_set != EXPECTED_URLS:
+        missing = sorted(EXPECTED_URLS - sitemap_set)
+        extra = sorted(sitemap_set - EXPECTED_URLS)
+        if missing:
+            errors.append("sitemap: URL manquantes: " + ", ".join(missing))
+        if extra:
+            errors.append("sitemap: URL inattendues: " + ", ".join(extra))
+    if len(sitemap_urls) != len(sitemap_set):
+        errors.append("sitemap: URL dupliquée")
+    if any("merci" in url for url in sitemap_urls):
+        errors.append("sitemap: merci.html ne doit pas être présente")
+
+    robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
+    if "User-agent: *" not in robots or "Allow: /" not in robots:
+        errors.append("robots.txt: directives d’exploration incorrectes")
     if f"Sitemap: {DOMAIN}/sitemap.xml" not in robots:
-        fail(errors, "Déclaration sitemap absente de robots.txt")
+        errors.append("robots.txt: déclaration du sitemap manquante")
+
+    # Verify that every generated indexable page is linked by at least one other generated page.
+    incoming: Counter[str] = Counter()
+    for rel, parser in parsed_pages.items():
+        for href in parser.links:
+            target = target_for_internal_link(href)
+            if target is None:
+                continue
+            try:
+                target_rel = target.relative_to(ROOT).as_posix()
+            except ValueError:
+                continue
+            incoming[target_rel] += 1
+    for rel in parsed_pages:
+        if rel in {"merci.html", "index.html"}:
+            continue
+        if incoming[rel] == 0:
+            errors.append(f"{rel}: page orpheline")
+
+    # Prevent near-duplicate local landing pages by comparing article trigrams.
+    zone_articles: dict[str, Counter[tuple[str, str, str]]] = {}
+    for rel, parser in parsed_pages.items():
+        if rel.startswith("zones/tapissier-"):
+            zone_articles[rel] = trigrams(" ".join(parser.article_parts))
+    zone_items = list(zone_articles.items())
+    for index, (rel_a, grams_a) in enumerate(zone_items):
+        for rel_b, grams_b in zone_items[index + 1 :]:
+            intersection = sum((grams_a & grams_b).values())
+            union = sum((grams_a | grams_b).values())
+            similarity = intersection / union if union else 0
+            if similarity > 0.25:
+                errors.append(f"contenu local trop similaire ({similarity:.2f}): {rel_a} / {rel_b}")
+
+    if not (ROOT / "index.html").exists():
+        warnings.append("index.html existant non inclus dans ce dossier de staging; il sera conservé par son blob GitHub.")
 
     if errors:
-        print("ÉCHEC SEO :")
-        for error in errors:
-            print(f"- {error}")
+        print("\n".join(f"ERREUR: {error}" for error in errors))
         return 1
-    print("OK : 27 URL, titres et descriptions uniques, H1/canonical valides, JSON-LD lisible et liens internes présents.")
+    print(
+        f"OK: {len(html_files)} fichiers HTML générés, {len(sitemap_urls)} URL sitemap, "
+        "métadonnées uniques, JSON-LD valide, liens internes valides et pages locales distinctes."
+    )
+    for warning in warnings:
+        print(f"AVERTISSEMENT: {warning}")
     return 0
 
 

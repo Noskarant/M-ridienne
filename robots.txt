@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://meridienne-tapissier.fr/sitemap.xml
