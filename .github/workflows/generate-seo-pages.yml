@@ -1,5 +1,6 @@
 name: Generate SEO pages
 
+# Generates the reviewed static pages and validates the SEO output.
 on:
   push:
     branches:
