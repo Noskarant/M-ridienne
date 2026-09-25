@@ -447,12 +447,12 @@
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // Attribution simple : campagne SITE10 + parrainage par ?ref=CODE.
-    // L'offre SITE10 s'affiche automatiquement du 02/01/2027 au 28/02/2027 inclus.
+    // L'offre SITE10 s'affiche automatiquement du 15/12/2026 au 31/01/2027 inclus.
     const REFERRAL_STORAGE_KEY = 'meridienne_referral_v1';
     const REFERRAL_TTL_MS = 30 * 24 * 60 * 60 * 1000;
     const SITE_CAMPAIGN_CODE = 'SITE10';
-    const SITE_CAMPAIGN_START = '2027-01-02';
-    const SITE_CAMPAIGN_END = '2027-02-28';
+    const SITE_CAMPAIGN_START = '2026-12-15';
+    const SITE_CAMPAIGN_END = '2027-01-31';
 
     function cleanCode(value) {
       return (value || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
