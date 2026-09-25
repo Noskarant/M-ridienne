@@ -385,7 +385,7 @@
         <h2>Parlez-nous de votre projet</h2>
       </div>
       <div id="referralNotice" class="referral-notice" hidden>
-        <p><strong>Vous avez été recommandé(e) par un client Méridienne.</strong><br>Votre code de parrainage <span id="referralCodeLabel" class="offer-code"></span> sera joint automatiquement à votre demande.</p>
+        <p><strong>Vous avez été recommandé(e) par un client Méridienne.</strong><br>Votre code <span id="referralCodeLabel" class="offer-code"></span> sera joint automatiquement à votre demande. Après validation du code lors du devis, vous bénéficiez de <strong>-10 % sur les tissus</strong>.</p>
       </div>
       <form id="contactForm" action="https://formspree.io/f/xdawdbee" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_next" value="merci.html">
@@ -396,7 +396,7 @@
         <div class="full-width"><label>Nom complet</label><input type="text" name="name" required placeholder="Votre nom"></div>
         <div><label>Email</label><input type="email" name="email" required placeholder="email@exemple.com"></div>
         <div><label>Téléphone</label><input type="tel" name="phone" placeholder="06 00 00 00 00"></div>
-        <div class="full-width"><label>Code avantage ou parrainage <span style="font-weight:400;">(facultatif)</span></label><input id="advantageCode" type="text" name="advantage_code" maxlength="32" autocomplete="off" placeholder="Ex. SITE10"><span class="code-help">Si vous avez reçu un code Méridienne, indiquez-le ici.</span></div>
+        <div class="full-width"><label>Code avantage ou parrainage <span style="font-weight:400;">(facultatif)</span></label><input id="advantageCode" type="text" name="advantage_code" maxlength="32" autocomplete="off" placeholder="Ex. SITE10"><span class="code-help">Si vous avez reçu un code Méridienne, indiquez-le ici. Les codes sont vérifiés lors du devis.</span></div>
         <div class="full-width"><label>Votre message (Type de meuble, dimensions...)</label><textarea name="message" rows="5" required placeholder="Bonjour, je voudrais restaurer un fauteuil Voltaire..."></textarea></div>
         <div class="full-width" style="text-align:center;margin-top:20px;"><button type="submit" class="btn" style="width:100%;">Envoyer ma demande</button></div>
       </form>
@@ -517,7 +517,7 @@
 
     const todayKey = localDateKey();
     const siteCampaignActive = todayKey >= SITE_CAMPAIGN_START && todayKey <= SITE_CAMPAIGN_END;
-    if (siteCampaignActive) siteOffer.hidden = false;
+    if (siteCampaignActive && !referralCode) siteOffer.hidden = false;
 
     useSiteCode.addEventListener('click', () => {
       advantageCode.value = SITE_CAMPAIGN_CODE;
