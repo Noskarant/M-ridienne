@@ -139,6 +139,17 @@
     input:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(5,30,53,0.1);}
     .full-width{grid-column:1/-1;}
 
+    /* OFFRES & ATTRIBUTION */
+    .offer-card{margin-top:24px;padding:18px 20px;border:1px solid rgba(197,160,101,.55);border-left:4px solid var(--accent);background:#fff;border-radius:var(--radius);box-shadow:0 5px 16px rgba(5,30,53,.06);max-width:520px;}
+    .offer-card[hidden]{display:none!important;}
+    .offer-card strong{color:var(--ink);}
+    .offer-code{display:inline-block;margin:0 5px;padding:3px 9px;background:var(--ink);color:#fff!important;border-radius:3px;font-weight:700;letter-spacing:1px;}
+    .offer-card a{font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+    .referral-notice{max-width:750px;margin:0 auto 22px;padding:16px 18px;background:#fff;border:1px solid rgba(197,160,101,.55);border-left:4px solid var(--accent);border-radius:var(--radius);}
+    .referral-notice[hidden]{display:none!important;}
+    .referral-notice p{margin:0;color:#333;}
+    .code-help{font-size:.85rem;color:var(--muted);margin-top:6px;display:block;}
+
     /* FOOTER */
     footer{background:var(--ink);color:var(--white);padding:60px 0 30px;text-align:center;font-size:0.9rem;}
     footer p{opacity:0.7;margin-top:10px;color:#ffffff;}
@@ -218,6 +229,10 @@
         <div style="display:flex;gap:15px;flex-wrap:wrap;">
           <a href="#contact" class="btn">Demander un devis</a>
           <a href="#showroom" class="btn btn-ghost">Voir le showroom</a>
+        </div>
+        <div id="siteOffer" class="offer-card" hidden>
+          <strong>Offre après-fêtes :</strong> -10 % sur les tissus avec le code <span class="offer-code">SITE10</span>.
+          <a href="#contact" id="useSiteCode">Utiliser le code</a>
         </div>
       </div>
       <div class="hero-img-box">
@@ -369,11 +384,19 @@
       <div class="section-header">
         <h2>Parlez-nous de votre projet</h2>
       </div>
-      <form action="https://formspree.io/f/xdawdbee" method="POST" enctype="multipart/form-data">
+      <div id="referralNotice" class="referral-notice" hidden>
+        <p><strong>Vous avez été recommandé(e) par un client Méridienne.</strong><br>Votre code de parrainage <span id="referralCodeLabel" class="offer-code"></span> sera joint automatiquement à votre demande.</p>
+      </div>
+      <form id="contactForm" action="https://formspree.io/f/xdawdbee" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_next" value="merci.html">
+        <input type="hidden" name="source" id="attributionSource" value="site">
+        <input type="hidden" name="referral_code" id="referralCodeHidden" value="">
+        <input type="hidden" name="campaign_code" id="campaignCodeHidden" value="">
+        <input type="hidden" name="landing_page" id="landingPageHidden" value="">
         <div class="full-width"><label>Nom complet</label><input type="text" name="name" required placeholder="Votre nom"></div>
         <div><label>Email</label><input type="email" name="email" required placeholder="email@exemple.com"></div>
         <div><label>Téléphone</label><input type="tel" name="phone" placeholder="06 00 00 00 00"></div>
+        <div class="full-width"><label>Code avantage ou parrainage <span style="font-weight:400;">(facultatif)</span></label><input id="advantageCode" type="text" name="advantage_code" maxlength="32" autocomplete="off" placeholder="Ex. SITE10"><span class="code-help">Si vous avez reçu un code Méridienne, indiquez-le ici.</span></div>
         <div class="full-width"><label>Votre message (Type de meuble, dimensions...)</label><textarea name="message" rows="5" required placeholder="Bonjour, je voudrais restaurer un fauteuil Voltaire..."></textarea></div>
         <div class="full-width" style="text-align:center;margin-top:20px;"><button type="submit" class="btn" style="width:100%;">Envoyer ma demande</button></div>
       </form>
@@ -416,11 +439,122 @@
       <p><strong>Durée de conservation</strong><br>Les données sont conservées le temps nécessaire au traitement de votre demande, puis supprimées.</p>
       <p><strong>Vos droits</strong><br>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Contact : meridienne.tapissier@orange.fr</p>
       <p><strong>Cookies</strong><br>Ce site n'utilise pas de cookies de tracking ou publicitaires.</p>
+      <p><strong>Codes de recommandation</strong><br>Lorsqu'un lien de parrainage est utilisé, un code de recommandation peut être conservé localement dans votre navigateur pendant 30 jours afin de l'associer à une éventuelle demande de devis. Cette information sert uniquement à mesurer les recommandations et n'est pas utilisée à des fins publicitaires.</p>
     </div>
   </div>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Attribution simple : campagne SITE10 + parrainage par ?ref=CODE.
+    // L'offre SITE10 s'affiche automatiquement du 02/01/2027 au 28/02/2027 inclus.
+    const REFERRAL_STORAGE_KEY = 'meridienne_referral_v1';
+    const REFERRAL_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+    const SITE_CAMPAIGN_CODE = 'SITE10';
+    const SITE_CAMPAIGN_START = '2027-01-02';
+    const SITE_CAMPAIGN_END = '2027-02-28';
+
+    function cleanCode(value) {
+      return (value || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+    }
+
+    function localDateKey(date = new Date()) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function storeReferral(code) {
+      try {
+        localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify({
+          code,
+          expiresAt: Date.now() + REFERRAL_TTL_MS
+        }));
+      } catch (_) {}
+    }
+
+    function readReferral() {
+      try {
+        const raw = localStorage.getItem(REFERRAL_STORAGE_KEY);
+        if (!raw) return '';
+        const data = JSON.parse(raw);
+        if (!data.code || !data.expiresAt || Date.now() > data.expiresAt) {
+          localStorage.removeItem(REFERRAL_STORAGE_KEY);
+          return '';
+        }
+        return cleanCode(data.code);
+      } catch (_) {
+        return '';
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const incomingRef = cleanCode(params.get('ref'));
+    if (incomingRef && incomingRef !== SITE_CAMPAIGN_CODE) storeReferral(incomingRef);
+    const referralCode = incomingRef && incomingRef !== SITE_CAMPAIGN_CODE ? incomingRef : readReferral();
+
+    const referralNotice = document.getElementById('referralNotice');
+    const referralLabel = document.getElementById('referralCodeLabel');
+    const advantageCode = document.getElementById('advantageCode');
+    const attributionSource = document.getElementById('attributionSource');
+    const referralCodeHidden = document.getElementById('referralCodeHidden');
+    const campaignCodeHidden = document.getElementById('campaignCodeHidden');
+    const landingPageHidden = document.getElementById('landingPageHidden');
+    const contactForm = document.getElementById('contactForm');
+    const siteOffer = document.getElementById('siteOffer');
+    const useSiteCode = document.getElementById('useSiteCode');
+
+    landingPageHidden.value = window.location.pathname + window.location.search;
+
+    if (referralCode) {
+      referralNotice.hidden = false;
+      referralLabel.textContent = referralCode;
+      referralCodeHidden.value = referralCode;
+      attributionSource.value = 'parrainage';
+      advantageCode.value = referralCode;
+    }
+
+    const todayKey = localDateKey();
+    const siteCampaignActive = todayKey >= SITE_CAMPAIGN_START && todayKey <= SITE_CAMPAIGN_END;
+    if (siteCampaignActive) siteOffer.hidden = false;
+
+    useSiteCode.addEventListener('click', () => {
+      advantageCode.value = SITE_CAMPAIGN_CODE;
+      campaignCodeHidden.value = SITE_CAMPAIGN_CODE;
+      attributionSource.value = 'site_campaign';
+    });
+
+    advantageCode.addEventListener('input', () => {
+      const code = cleanCode(advantageCode.value);
+      if (code === SITE_CAMPAIGN_CODE) {
+        campaignCodeHidden.value = SITE_CAMPAIGN_CODE;
+        referralCodeHidden.value = '';
+        attributionSource.value = 'site_campaign';
+      } else if (code) {
+        referralCodeHidden.value = code;
+        campaignCodeHidden.value = '';
+        attributionSource.value = 'parrainage';
+      } else {
+        referralCodeHidden.value = referralCode || '';
+        campaignCodeHidden.value = '';
+        attributionSource.value = referralCode ? 'parrainage' : 'site';
+      }
+    });
+
+    contactForm.addEventListener('submit', () => {
+      const code = cleanCode(advantageCode.value);
+      advantageCode.value = code;
+      if (code === SITE_CAMPAIGN_CODE) {
+        campaignCodeHidden.value = SITE_CAMPAIGN_CODE;
+        referralCodeHidden.value = '';
+        attributionSource.value = 'site_campaign';
+      } else if (code) {
+        referralCodeHidden.value = code;
+        campaignCodeHidden.value = '';
+        attributionSource.value = 'parrainage';
+      }
+    });
 
     window.addEventListener('scroll', () => {
       if(window.scrollY > 100) document.body.classList.add('scrolled');
